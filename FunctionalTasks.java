@@ -57,36 +57,39 @@ public class FunctionalTasks {
 
     // Завдання 5: чергування елементів двох стрімів до завершення коротшого
     public static <T> Stream<T> zip(Stream<T> first, Stream<T> second) {
-        Iterator<T> it1 = first.iterator();
-        Iterator<T> it2 = second.iterator();
+    Iterator<T> it1 = first.iterator();
+    Iterator<T> it2 = second.iterator();
 
-        Iterator<T> zippedIterator = new Iterator<>() {
-            private boolean takeFromFirst = true;
+    Iterator<T> zippedIterator = new Iterator<>() {
+        private boolean takeFromFirst = true;
 
-            @Override
-            public boolean hasNext() {
-                return it1.hasNext() && it2.hasNext();
+        @Override
+        public boolean hasNext() {
+            return takeFromFirst ? it1.hasNext() : it2.hasNext();
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new java.util.NoSuchElementException();
             }
-
-            @Override
-            public T next() {
-                if (takeFromFirst) {
-                    takeFromFirst = false;
-                    return it1.next();
-                } else {
-                    takeFromFirst = true;
-                    return it2.next();
-                }
+            if (takeFromFirst) {
+                takeFromFirst = false;
+                return it1.next();
+            } else {
+                takeFromFirst = true;
+                return it2.next();
             }
-        };
+        }
+    };
 
-        Spliterator<T> spliterator = Spliterators.spliteratorUnknownSize(
-                zippedIterator,
-                Spliterator.ORDERED | Spliterator.NONNULL
-        );
+    Spliterator<T> spliterator = Spliterators.spliteratorUnknownSize(
+            zippedIterator,
+            Spliterator.ORDERED | Spliterator.NONNULL
+    );
 
-        return StreamSupport.stream(spliterator, false);
-    }
+    return StreamSupport.stream(spliterator, false);
+}
 
     public static void main(String[] args) {
         // Тест 1
